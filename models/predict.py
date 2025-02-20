@@ -1,43 +1,86 @@
 import joblib
 import pandas as pd
-import sys
 import os
 
+# Define model path
+MODEL_PATH = os.path.join(os.path.dirname(__file__), "UHI_xgboost.pkl")
+
 def load_model():
-    # Get the directory of this file (should be the project root if predict.py is here)
-    project_root = os.path.dirname(os.path.abspath(__file__))
-    # Build the path to the model file (which is in the "models" folder at the project root)
-    model_path = os.path.join(project_root, "UHI_xgboost.pkl")
-    print("Looking for model file at:", model_path)
+    """Loads the trained XGBoost model."""
+    if not os.path.exists(MODEL_PATH):
+        raise FileNotFoundError(f"❌ Model file '{MODEL_PATH}' not found!")
+    print("✅ Model loaded successfully.")
+    return joblib.load(MODEL_PATH)
+
+def preprocess_features(features: dict):
+    """Processes input features and ensures exact order matching the model."""
     
-    if not os.path.exists(model_path):
-        print(f"Model file '{model_path}' not found!")
-        sys.exit(1)
+    # Define expected order of features (MUST match training order)
+    expected_features = [
+        "Name", "Description", "location_id", "AirTempatSurfacedegC",
+        "RelativeHumiditypercent", "AvgWindSpeedms", "WindDirectiondegrees",
+        "SolarFluxWm2", "Latitude", "Longitude", "Altitude",
+        "hour", "day", "month", "weekday"
+    ]
+
+    # Fill missing features with defaults
+    default_values = {
+        "Name": "Unknown",
+        "Description": "None",
+        "location_id": "0",
+        "Latitude": 0.0,
+        "Longitude": 0.0
+    }
     
-    model = joblib.load(model_path)
-    print("Model loaded successfully.")
-    return model
+    for feature in expected_features:
+        if feature not in features:
+            features[feature] = default_values.get(feature, 0)
+
+    # Convert to DataFrame & enforce correct column order
+    df = pd.DataFrame([features])[expected_features]
+
+    # Convert categorical features into numeric labels
+    for cat_col in ["Name", "Description", "location_id"]:
+        df[cat_col] = df[cat_col].astype("category").cat.codes
+
+    return df
 
 def predict(features: dict):
+    """Prepares input features and makes a prediction."""
     model = load_model()
-    # Convert the input dictionary into a DataFrame
-    df = pd.DataFrame([features])
-    print("Input DataFrame for prediction:")
-    print(df)
-    # Make a prediction
+
+    # Preprocess input data
+    df = preprocess_features(features)
+
+    # Ensure model feature order is identical to df column order
+    model_feature_order = model.get_booster().feature_names
+    df = df[model_feature_order]  # Sort DataFrame columns to match model
+    
+    # Make prediction
     prediction = model.predict(df)[0]
     return prediction
 
 if __name__ == "__main__":
-    print("Running predict.py")
-    # Sample input: adjust these keys to match the features used during training.
+    print("🔄 Running Prediction...")
+
+    # Example input (Modify as needed)
     sample_input = {
-        "Longitude": 80.9462,  # Lucknow longitude
-        "Latitude": 26.8467,   # Lucknow latitude
-        "hour": 14,            # local hour (24-hour format)
-        "day": 19,             # sample day (adjust as appropriate)
-        "month": 2,            # sample month (adjust as appropriate)
-        "weekday": 4           # weekday as integer (Monday=0, Sunday=6; adjust accordingly)
+        "Name": "Building A",
+        "Description": "Commercial Area",
+        "location_id": "123",
+        "AirTempatSurfacedegC": 32.5,
+        "RelativeHumiditypercent": 60,
+        "AvgWindSpeedms": 2.5,
+        "WindDirectiondegrees": 180,
+        "SolarFluxWm2": 450,
+        "Latitude": 26.8467,
+        "Longitude": 80.9462,
+        "Altitude": 120,
+        "hour": 14,
+        "day": 19,
+        "month": 2,
+        "weekday": 4
     }
+
     pred = predict(sample_input)
-    print("Predicted UHI Index:", pred)
+    print(f"🎯 Predicted UHI Index: {pred:.4f}")
