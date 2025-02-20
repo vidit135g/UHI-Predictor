@@ -1,0 +1,15 @@
+# .gitignore
+# ------------------------------
+# Ignore virtual environment folders
+venv/
+.env/
+
+# Ignore Python cache
+__pycache__/
+*.pyc
+
+# Ignore Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Ignore model files (optional)
+models/*.pkl

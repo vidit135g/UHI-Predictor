@@ -1,0 +1,29 @@
+# 🛠️ Core Data Processing Libraries
+numpy               # Numerical computing & array manipulation
+pandas              # Data analysis & manipulation
+scipy               # Scientific computing and optimization
+scikit-learn        # Machine learning algorithms & preprocessing
+imbalanced-learn    # Handling imbalanced datasets
+
+# 🌍 Geospatial Analysis & Mapping
+geopandas           # Geospatial data handling (extends pandas)
+osmnx               # OpenStreetMap data retrieval & analysis
+rasterio            # Raster data processing (satellite images, GIS)
+folium              # Interactive maps visualization
+pyproj              # Geospatial coordinate transformations
+shapely             # Geometry operations for geospatial analysis
+
+# 📊 Data Visualization
+matplotlib          # Static plots & charts
+seaborn             # Statistical data visualization (extends matplotlib)
+plotly              # Interactive data visualizations
+
+# 🤖 Machine Learning & Optimization
+xgboost             # Extreme Gradient Boosting for ML models
+catboost            # Categorical Gradient Boosting (handles categorical features well)
+shap                # Explainable AI (SHAP values for feature importance)
+optuna              # Hyperparameter tuning & model optimization
+
+# ⚙️ Workflow & Development
+prefect             # Workflow automation & task orchestration
+jupyterlab          # Jupyter Notebook environment for interactive computing
