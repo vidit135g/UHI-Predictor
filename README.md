@@ -98,3 +98,96 @@ The project follows these high-level steps:
    git clone https://github.com/yourusername/UHI-Predictor.git
    cd UHI-Predictor
 
+# UHI Predictor - README
+
+## 📌 Project Overview
+The **UHI Predictor** is a machine learning model designed to predict the Urban Heat Island (UHI) Index based on various meteorological and geographical parameters. This project has undergone significant improvements to enhance accuracy, compliance, and usability.
+
+---
+
+## 🚀 Key Improvements & Enhancements
+### ✅ **Feature Engineering Refinements**
+- **Removed Non-Compliant Features**: Longitude and Latitude were eliminated as predictive features to ensure model adaptability across different regions.
+- **New Predictive Features Added**:
+  - **Air Temperature at Surface (°C)**
+  - **Relative Humidity (%)**
+  - **Average Wind Speed (m/s)**
+  - **Wind Direction (°)**
+  - **Solar Flux (W/m²)**
+  - **Altitude (m)**
+  - **Hour of the Day**
+  - **Day of the Month**
+  - **Month of the Year**
+  - **Weekday Indicator**
+
+### 🎨 **Revamped Web Application UI**
+- **Modern Material Design with Pastel Colors**
+- **Improved User Experience**:
+  - Animated form fields
+  - Vibrant buttons with hover effects
+  - Background images for enhanced aesthetics
+  - Dynamic tooltips explaining each input field
+- **Prediction Scale Information**:
+  - A floating hover popup provides insights into the UHI Index scale.
+  - Explains what low, moderate, and high UHI Index values indicate.
+
+### 📊 **Model Enhancements**
+- **Optimized XGBoost Model**:
+  - Enabled categorical support for features requiring encoding.
+  - Feature selection process refined to exclude non-numeric columns.
+- **Dataset Validation**:
+  - The training pipeline now checks for missing or invalid values before processing.
+  - Enhanced error handling prevents crashes due to incorrect data formats.
+
+### 🛠 **Technical Fixes & Compliance**
+- **Resolved Feature Name Mismatches**:
+  - Ensured input data matches the expected model features.
+  - Implemented data transformation before passing inputs to the model.
+- **Handled Missing Data in Feature Engineering**:
+  - Implemented forward-fill and backward-fill techniques where applicable.
+- **Optimized Data Processing Pipelines**:
+  - Improved efficiency of merging datasets (Weather, Building Footprints, UHI Data).
+  - Ensured proper datetime format handling across datasets.
+
+---
+
+## 🏗️ How to Run the Project
+### **1️⃣ Set Up Environment**
+```sh
+pip install -r requirements.txt
+```
+
+### **2️⃣ Train the Model**
+```sh
+python models/train.py
+```
+
+### **3️⃣ Start the Web Application**
+```sh
+uvicorn app:app --reload
+```
+
+### **4️⃣ Access the Web App**
+Open **http://127.0.0.1:8000/** in your browser.
+
+---
+
+## ✅ Compliance with Requirements
+| Compliance Aspect | Status |
+|-------------------|--------|
+| Longitude & Latitude removed from ML model | ✅ Done |
+| New weather and environmental features included | ✅ Done |
+| Pastel-themed web UI with improved UX | ✅ Done |
+| Detailed prediction scale info | ✅ Done |
+| Data validation for missing/null values | ✅ Done |
+| Model retraining & validation checks | ✅ Done |
+
+---
+
+## 📝 Next Steps & Future Enhancements
+- **Improve Feature Selection**: Explore additional environmental factors.
+- **Deploy to Cloud**: Deploy the model via AWS/GCP for wider accessibility.
+- **Live Data Integration**: Fetch real-time weather data for better predictions.
+
+📌 **Final Note**: This version of UHI Predictor ensures compliance with project rules while improving user experience and model accuracy. 🚀
+
