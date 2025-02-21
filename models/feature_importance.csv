@@ -1,0 +1,11 @@
+Feature,Importance
+AirTempSurface,0.0
+RelativeHumidity,0.0
+AvgWindSpeed,0.0
+WindDirection,0.0
+SolarFlux,0.0
+Altitude,0.0
+hour,0.0
+day,0.0
+month,0.0
+weekday,0.0
