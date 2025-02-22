@@ -16,51 +16,31 @@ st.set_page_config(
 file_path = "data/processed/UHI_Weather_Building_Sentinel_LST_Featured_Cleaned.csv"
 df = pd.read_csv(file_path)
 # ----------------- 🎨 Custom Dark Theme Styling -----------------
-st.markdown("""
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
-        .poppins-thin {
-            font-family: "Poppins", serif;
-            font-weight: 100;
-            font-style: normal;
-        }
-        html, body, [class*="css"] {
-            font-family: 'poppins-thin', serif;
-            font-weight:100;
-            background: #121212;
-            color: #e0e0e0;
-        }
-        .st-emotion-cache-1lnhyzl {
-            background: linear-gradient(to right, #1e1e1e, #292929);
-            padding: 15px;
-            font-family: 'poppins-thin', serif;
-            font-weight:100;
-            border-radius: 8px;
-            text-align: center;
-            font-size: 18px;
-            font-weight: bold;
-        }
-        .stButton>button {
-            background: linear-gradient(45deg, #FF6B6B, #FFD166);
-            color: white;
-            font-size: 16px;
-            font-family: 'poppins-thin', serif;
-            font-weight:100;
-            padding: 10px 24px;
-            border-radius: 8px;
-            transition: 0.3s;
-        }
-        .stButton>button:hover {
-            background: linear-gradient(45deg, #FF8E8E, #FFE599);
-            font-family: 'poppins-thin', serif;
-            font-weight:100;
-        }
-    </style>
-""", unsafe_allow_html=True)
+
+custom_css = """
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700&display=swap');
+
+    html, body, [class*="st-"], [class*="css-"] {
+        font-family: 'Poppins', sans-serif !important;
+    }
+
+    .stApp {
+        font-family: 'Poppins', sans-serif !important;
+    }
+
+    h1, h2, h3, h4, h5, h6, p, div {
+        font-family: 'Poppins', sans-serif !important;
+    }
+</style>
+"""
+
+st.markdown(custom_css, unsafe_allow_html=True)
+
 
 # ----------------- 🏠 Sidebar Navigation -----------------
 st.sidebar.title("🔍 Navigation")
-nav_option = st.sidebar.radio("Go To:", ["🏠 Home", "📈 Predict UHI", "📊 Visualizations", "📂 Upload Dataset", "📖 Insights & Recommendations", "ℹ️ About"])
+nav_option = st.sidebar.radio("Go To:", ["🏠 Home", "📈 Predict UHI", "📊 Visualizations", "📖 Insights", "ℹ️ About"])
 
 # ----------------- 📌 Load Models -----------------
 @st.cache_resource
@@ -86,7 +66,7 @@ if nav_option == "🏠 Home":
     - **📂 Upload Data:** Retrain models with custom datasets.
     - **📖 Learn More:** Insights on how UHI affects cities.
     """)
-    st.image("assets/urban_heat.jpg", use_column_width=True)
+    st.image("assets/urban_heat.jpg", use_container_width=True)
 
     file_path = "data/processed/UHI_Weather_Building_Sentinel_LST_Featured_Cleaned.csv"
     df = pd.read_csv(file_path)
@@ -98,6 +78,32 @@ elif nav_option == "📈 Predict UHI":
     # 🌍 Satellite Data
     tab1, tab2, tab3 = st.tabs(["🌍 Satellite Data", "🌡️ Weather Factors", "🏢 Urban Features"])
     
+    st.markdown("""
+    <style>
+        /* 🎨 Custom Slider Track */
+        div[data-baseweb="slider"] > div > div {
+            background: linear-gradient(90deg, #FF6B6B, #FFD166) !important;
+            height: 4px !important;
+            border-radius: 10px;
+        }
+
+        /* 🎨 Custom Slider Thumb */
+        div[data-baseweb="slider"] > div > div > div {
+            background: #FFD166 !important;
+            width: 25px !important;
+            height: 25px !important;
+            border-radius: 50% !important;
+            border: 2px solid white !important;
+        }
+
+        /* 🎨 Custom Hover Effect on Thumb */
+        div[data-baseweb="slider"] > div > div > div:hover {
+            background: #FF8E8E !important;
+            transform: scale(1.8);
+        }
+    </style>
+""", unsafe_allow_html=True)
+
     with tab1:
         st.subheader("🌍 Satellite Data")
         user_inputs = {
@@ -154,7 +160,7 @@ elif nav_option == "📈 Predict UHI":
 
         except ValueError as e:
             st.error(f"⚠️ Prediction Error: {e}")
-# ----------------- 📊 Visualizations -----------------
+
 # ----------------- 📊 Visualizations -----------------
 elif nav_option == "📊 Visualizations":
     st.title("📊 UHI Data Visualizations")
@@ -189,36 +195,9 @@ elif nav_option == "📊 Visualizations":
     st.pyplot(fig)
 
     # 📊 **4️⃣ Box Plot: UHI Index by Time of Day**
-    st.subheader("📊 Box Plot: UHI Index by Time of Day")
-    fig, ax = plt.subplots(figsize=(10, 5))
-    sns.boxplot(x=df["hour_category"], y=df["uhi_index"], palette="coolwarm", ax=ax)
-    ax.set_title("UHI Index Variation Across Different Times of the Day")
-    st.pyplot(fig)
-
-    # 📉 **5️⃣ Pairplot: Key Features vs. UHI Index**
-    st.subheader("📉 Pair Plot: Key Features vs. UHI Index")
-    selected_features = ["uhi_index", "land_surface_temp", "air_temp_at_surface_degc", "humidity_temp_interaction"]
-    fig = sns.pairplot(df[selected_features], diag_kind="kde", plot_kws={"alpha": 0.5})
-    st.pyplot(fig)
-
-   
-
-# ----------------- 📂 Upload Dataset -----------------
-elif nav_option == "📂 Upload Dataset":
-    file_path = "data/processed/UHI_Weather_Building_Sentinel_LST_Featured_Cleaned.csv"
-    df = pd.read_csv(file_path)
-    st.title("📂 Upload New Dataset")
-    uploaded_file = st.file_uploader("📌 Upload a CSV File", type=["csv"])
-    if uploaded_file:
-        file_path = "data/processed/UHI_Weather_Building_Sentinel_LST_Featured_Cleaned.csv"
-        df = pd.read_csv(file_path)
-        df_uploaded = pd.read_csv(uploaded_file)
-        st.success(f"✅ File Uploaded! Shape: {df_uploaded.shape}")
-        st.dataframe(df_uploaded.head())
 
 # 📖 Insights & Recommendations
-# 📖 Insights & Recommendations
-elif nav_option == "📖 Insights & Recommendations":
+elif nav_option == "📖 Insights":
     st.title("📖 Real-Time Insights & Recommendations")
 
     # ✅ Check if predictions exist
@@ -286,13 +265,85 @@ elif nav_option == "📖 Insights & Recommendations":
 
 # ----------------- ℹ️ About Page -----------------
 
+# ----------------- ℹ️ About Page -----------------
 elif nav_option == "ℹ️ About":
-    file_path = "data/processed/UHI_Weather_Building_Sentinel_LST_Featured_Cleaned.csv"
-    df = pd.read_csv(file_path)
     st.title("ℹ️ About This App")
-    st.markdown("🌎 A powerful tool for analyzing Urban Heat Islands.")
+    
+    st.markdown("""
+        ## 🌎 Urban Heat Island (UHI) Index Predictor  
+        This web application predicts **Urban Heat Island (UHI) Index** values based on environmental, meteorological, and urban landscape data.  
+        UHI is a critical environmental phenomenon where urban areas experience significantly **higher temperatures** than surrounding rural regions due to factors like infrastructure, land usage, and population density.  
 
-file_path = "data/processed/UHI_Weather_Building_Sentinel_LST_Featured_Cleaned.csv"
-df = pd.read_csv(file_path)
-st.markdown("---")
-st.markdown("🚀 Built for Smart Urban Planning | Powered by ML")
+        This tool helps urban planners, researchers, and environmentalists **analyze** and **mitigate** UHI effects by providing data-driven insights.
+    """)
+
+    st.markdown("---")
+
+    st.subheader("🔍 Why Was This App Made?")
+    st.markdown("""
+    - **📈 Predict UHI Index** → Uses **machine learning models** to forecast UHI intensity at different locations.  
+    - **📊 Identify Key Contributors** → Highlights **factors** influencing urban heat hotspots.  
+    - **🏙️ Support Smart Urban Planning** → Helps policymakers **make informed decisions** on mitigating urban heat.  
+    - **📉 Provide Interactive Visualizations** → Showcases data trends through **heatmaps, scatter plots, and insights**.  
+    """)
+
+    st.markdown("---")
+
+    st.subheader("🚀 Features of the UHI Predictor")
+    st.markdown("""
+    - ✅ **Predict UHI Index** → Predicts UHI index for specific locations based on input parameters.  
+    - ✅ **Data Visualizations** → Interactive graphs, heatmaps, and statistical insights on UHI patterns.  
+    - ✅ **Upload Custom Data** → Users can upload CSV files to analyze custom datasets.  
+    - ✅ **Real-Time Insights** → Generates automatic recommendations based on predicted values.  
+    - ✅ **Dark Mode Support** → Ensures better readability and aesthetics.  
+    """)
+
+    st.markdown("---")
+
+    st.subheader("📌 Machine Learning Models Used")
+    st.markdown("""
+    - 🔹 **Random Forest Regressor** → A tree-based ensemble model, effective for handling complex relationships.  
+    - 🔹 **XGBoost Regressor** → A high-performance boosting algorithm optimized for predictive accuracy.  
+
+    Both models were trained and evaluated using **cross-validation** techniques for optimal accuracy.
+    """)
+
+    st.markdown("---")
+
+    st.subheader("📂 Data Used for Training")
+    st.markdown("""
+    The model was trained on a dataset collected on **24 July 2021**, covering the **Bronx and Manhattan region** in New York City. The dataset includes:  
+    - 🔹 **Latitude & Longitude** → Geospatial reference points  
+    - 🔹 **Urban Surface Temperature** → Satellite-derived temperature readings  
+    - 🔹 **Weather Factors** → Wind speed, humidity, air temperature, solar flux  
+    - 🔹 **Urban Infrastructure Data** → Building density, land surface types  
+    - 🔹 **Time-Based Features** → Hour, weekday, month, and categorized time slots  
+    - 🔹 **Satellite Data** → NDVI (Vegetation Index), NDBI (Built-Up Index), Surface Albedo  
+
+    Feature engineering techniques, including **categorization, one-hot encoding, and interaction features**, were applied to improve model accuracy.
+    """)
+
+    st.markdown("---")
+
+    st.subheader("📦 Libraries & Technologies Used")
+    st.markdown("""
+    - 🔹 **Machine Learning** → `scikit-learn`, `XGBoost`, `joblib`  
+    - 🔹 **Data Processing** → `pandas`, `numpy`, `seaborn`  
+    - 🔹 **Visualization** → `matplotlib`, `plotly`, `seaborn`  
+    - 🔹 **Web App Development** → `streamlit`  
+    """)
+
+    st.markdown("---")
+
+    st.subheader("👨‍💻 Developed By")
+    st.markdown("""
+    💡 **Vidit Gupta**  
+    A passionate **Cybersecurity Engineer & Cloud Security Consultant** with expertise in **Cyber Risk, Cloud Security, DevSecOps, and Compliance Audits**.  
+    With a strong background in **Cybersecurity Assessments, IT Risk Management, and Secure Cloud Architecture**, Vidit specializes in building **secure, scalable, and resilient solutions** to protect businesses from evolving cyber threats.  
+    
+    
+    🚀 Dedicated to **ensuring security-first digital transformations** and **strengthening enterprise cyber resilience**.
+    """)
+
+    st.markdown("---")
+    st.markdown("📌 **Built for Smart Urban Planning | Powered by Machine Learning** 🚀")

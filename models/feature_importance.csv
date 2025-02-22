@@ -1,11 +1,3 @@
-Feature,Importance
-AirTempSurface,0.0
-RelativeHumidity,0.0
-AvgWindSpeed,0.0
-WindDirection,0.0
-SolarFlux,0.0
-Altitude,0.0
-hour,0.0
-day,0.0
-month,0.0
-weekday,0.0
+version https://git-lfs.github.com/spec/v1
+oid sha256:e71b5c732ccd81e1a50039c9ed4b5a5e279fd3e5b79492281bad46ad4e01a0bb
+size 160
