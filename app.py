@@ -42,16 +42,29 @@ st.markdown(custom_css, unsafe_allow_html=True)
 st.sidebar.title("🔍 Navigation")
 nav_option = st.sidebar.radio("Go To:", ["🏠 Home", "📈 Predict UHI", "📊 Visualizations", "📖 Insights", "ℹ️ About"])
 
-# ----------------- 📌 Load Models -----------------
 @st.cache_resource
 def load_models():
+    model_files = [
+        "models/rf_model.pkl",
+        "models/xgb_model.pkl",
+        "models/encoder.pkl",
+        "models/feature_names.pkl"
+    ]
+
+    # 🔍 Check if all models exist
+    for file in model_files:
+        if not os.path.exists(file):
+            st.error(f"❌ Missing file: {file}. Ensure models are uploaded before deployment.")
+            raise FileNotFoundError(f"File not found: {file}")
+
     return {
-        "rf_model": joblib.load("models/rf_model.pkl"),
-        "xgb_model": joblib.load("models/xgb_model.pkl"),
-        "encoder": joblib.load("models/encoder.pkl"),
-        "feature_names": joblib.load("models/feature_names.pkl")
+        "rf_model": joblib.load(model_files[0]),
+        "xgb_model": joblib.load(model_files[1]),
+        "encoder": joblib.load(model_files[2]),
+        "feature_names": joblib.load(model_files[3])
     }
 
+# Load models
 models = load_models()
 
 # ----------------- 🏠 Home Page -----------------
