@@ -6,9 +6,9 @@
 ---
 
 ## 🎥 Live Demo  
-### 📌 Watch the Full Demo Here:  
-<iframe width="800" height="450" src="https://youtu.be/2-cxQMd-Jrc" frameborder="0" allowfullscreen></iframe>  
 
+### 📌 Watch the Full Demo Here:  
+[![Watch the Video](https://img.youtube.com/vi/2-cxQMd-Jrc/maxresdefault.jpg)](https://www.youtube.com/watch?v=2-cxQMd-Jrc)  
 ---
 
 ## 📖 Background & Purpose  
