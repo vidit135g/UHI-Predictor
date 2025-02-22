@@ -8,7 +8,7 @@
 ## 🎥 Live Demo  
 
 ### 📌 Watch the Full Demo Here:  
-[![Watch the Video](https://img.youtube.com/vi/2-cxQMd-Jrc/maxresdefault.jpg)](https://www.youtube.com/watch?v=2-cxQMd-Jrc)  
+![Watch the Video](https://www.youtube.com/watch?v=2-cxQMd-Jrc)  
 ---
 
 ## 📖 Background & Purpose  
