@@ -73,19 +73,19 @@ elif nav_option == "📈 Predict UHI":
     st.markdown("""
     <style>
         div[data-baseweb="slider"] > div > div {
-            background: linear-gradient(90deg, #2ECC71, #27AE60) !important;
+            background: linear-gradient(90deg, #F1D7BB, #F1D7BB) !important;
             height: 5px !important;
             border-radius: 10px;
         }
         div[data-baseweb="slider"] > div > div > div {
-            background: #27AE60 !important;
+            background: #129A7D !important;
             width: 25px !important;
             height: 25px !important;
             border-radius: 50% !important;
             border: 2px solid white !important;
         }
         div[data-baseweb="slider"] > div > div > div:hover {
-            background: #2ECC71 !important;
+            background: #9BD3CB !important;
             transform: scale(1.5);
         }
     </style>
@@ -168,10 +168,84 @@ elif nav_option == "📊 Visualizations":
     df_numeric = df.drop(columns=[col for col in non_numeric_cols if col in df.columns], errors="ignore")
 
     # 🌡️ **1️⃣ Heatmap of UHI vs. Features**
-    st.subheader("🌡️ Heatmap of UHI vs. Features")
-    fig, ax = plt.subplots(figsize=(10, 5))
-    sns.heatmap(df_numeric.corr(), annot=True, cmap="coolwarm", linewidths=0.5, ax=ax)
-    st.pyplot(fig)
+
+    # 🌡️ **1️⃣ Heatmap of UHI vs. Features**
+# 📈 **2️⃣ Dynamic Scatter Plot**
+    st.subheader("📈 Relationship Between Features")
+
+    x_feature = st.selectbox("📌 Select X-Axis Feature", df_numeric.columns, index=list(df_numeric.columns).index("land_surface_temp"))
+    y_feature = st.selectbox("📌 Select Y-Axis Feature", df_numeric.columns, index=list(df_numeric.columns).index("uhi_index"))
+
+    fig = px.scatter(
+        df_numeric, x=x_feature, y=y_feature, trendline="ols",
+        labels={x_feature: x_feature, y_feature: y_feature},
+        title=f"📌 Relationship Between {x_feature} and {y_feature}"
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
+
+    # 🌡️ **1️⃣ Correlation Heatmap with Adjustable Features**
+    st.subheader("🌡️ Correlation Heatmap with Selectable Features")
+    
+    selected_features = st.multiselect(
+        "📌 Select Features for Correlation Heatmap",
+        options=df_numeric.columns.tolist(),
+        default=["uhi_index", "land_surface_temp", "ndvi", "ndbi", "air_temp_at_surface_"]
+    )
+
+    correlation_threshold = st.slider("📏 Set Minimum Correlation Threshold", 0.0, 1.0, 0.3, 0.05)
+
+    if selected_features:
+        filtered_corr = df_numeric[selected_features].corr()
+        filtered_corr = filtered_corr[abs(filtered_corr) > correlation_threshold]
+
+        fig, ax = plt.subplots(figsize=(10, 5))
+        sns.heatmap(filtered_corr, annot=True, cmap="coolwarm", linewidths=0.5, ax=ax)
+        st.pyplot(fig)
+
+    # 📈 **2️⃣ Pairplot with Selectable Features**
+    st.subheader("📈 Pairplot: Explore Relationships")
+    
+    pairplot_features = st.multiselect(
+        "📌 Select Features for Pairplot",
+        options=df_numeric.columns.tolist(),
+        default=["uhi_index", "land_surface_temp", "ndvi", "ndbi"]
+    )
+
+    if len(pairplot_features) >= 2:
+        fig = sns.pairplot(df_numeric[pairplot_features], diag_kind="kde", plot_kws={"alpha": 0.6})
+        st.pyplot(fig)
+    else:
+        st.warning("⚠️ Select at least 2 features for the pairplot.")
+
+    # 🌍 **3️⃣ Interactive 3D Scatter Plot**
+    st.subheader("🌍 3D Scatter Plot")
+
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        x_axis = st.selectbox("📌 Select X-Axis", df_numeric.columns.tolist(), index=df_numeric.columns.get_loc("land_surface_temp"))
+    with col2:
+        y_axis = st.selectbox("📌 Select Y-Axis", df_numeric.columns.tolist(), index=df_numeric.columns.get_loc("uhi_index"))
+    with col3:
+        z_axis = st.selectbox("📌 Select Z-Axis", df_numeric.columns.tolist(), index=df_numeric.columns.get_loc("ndvi"))
+
+    fig = px.scatter_3d(df_numeric, x=x_axis, y=y_axis, z=z_axis, color="uhi_index",
+                         title="3D Visualization of UHI Factors", template="plotly_dark")
+    st.plotly_chart(fig)
+
+   # 🌡️ **1️⃣ Interactive Correlation Heatmap**
+    st.subheader("🌡️ Interactive Correlation Heatmap")
+    corr_matrix = df_numeric.corr()
+
+    fig = px.imshow(
+        corr_matrix,
+        labels=dict(x="Features", y="Features", color="Correlation"),
+        x=corr_matrix.columns,
+        y=corr_matrix.columns,
+        color_continuous_scale="RdBu",
+        title="📌 Feature Correlation Heatmap"
+    )
+    st.plotly_chart(fig, use_container_width=True)
 
     # 📈 **2️⃣ Scatter Plot: Land Surface Temp vs. UHI Index**
     st.subheader("📈 Scatter Plot: Land Surface Temp vs. UHI Index")
@@ -209,8 +283,22 @@ elif nav_option == "📖 Insights":
 
     # 🌡️ Correlation with UHI
     st.subheader("📊 Correlation of Features with UHI Index")
+
     correlation = df_numeric.corr()["uhi_index"].sort_values(ascending=False)
-    st.bar_chart(correlation)
+
+    fig = px.bar(
+        correlation, 
+        x=correlation.index, 
+        y=correlation.values,
+        text=correlation.values.round(2),
+        labels={"x": "Features", "y": "Correlation"},
+        title="📌 Feature Correlation with UHI Index",
+        color=correlation.values, 
+        color_continuous_scale="RdBu"
+    )
+
+    fig.update_traces(textposition="outside")
+    st.plotly_chart(fig, use_container_width=True)
 
     # 📌 Key Insights
     st.subheader(f"🔍 UHI Index: **{uhi_value:.4f}** - Interpretation")
