@@ -13,10 +13,8 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
-file_path = "data/processed/UHI_Weather_Building_Sentinel_LST_Featured_Cleaned.csv"
-df = pd.read_csv(file_path)
-# ----------------- 🎨 Custom Dark Theme Styling -----------------
 
+# ----------------- 🎨 Custom Styling -----------------
 custom_css = """
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700&display=swap');
@@ -42,80 +40,59 @@ st.markdown(custom_css, unsafe_allow_html=True)
 st.sidebar.title("🔍 Navigation")
 nav_option = st.sidebar.radio("Go To:", ["🏠 Home", "📈 Predict UHI", "📊 Visualizations", "📖 Insights", "ℹ️ About"])
 
+# ----------------- 📌 Load Models -----------------
 @st.cache_resource
 def load_models():
-    model_files = [
-        "models/rf_model.pkl",
-        "models/xgb_model.pkl",
-        "models/encoder.pkl",
-        "models/feature_names.pkl"
-    ]
-
-    # 🔍 Check if all models exist
-    for file in model_files:
-        if not os.path.exists(file):
-            st.error(f"❌ Missing file: {file}. Ensure models are uploaded before deployment.")
-            raise FileNotFoundError(f"File not found: {file}")
-
-    return {
-        "rf_model": joblib.load(model_files[0]),
-        "xgb_model": joblib.load(model_files[1]),
-        "encoder": joblib.load(model_files[2]),
-        "feature_names": joblib.load(model_files[3])
+    model_files = {
+        "rf_model": "models/rf_model.pkl",
+        "xgb_model": "models/xgb_model.pkl",
+        "encoder": "models/encoder.pkl",
+        "feature_names": "models/feature_names.pkl"
     }
 
-# Load models
+    for key, path in model_files.items():
+        if not os.path.exists(path):
+            st.error(f"❌ Missing model file: {path}")
+            raise FileNotFoundError(f"File not found: {path}")
+
+    return {key: joblib.load(path) for key, path in model_files.items()}
+
 models = load_models()
 
 # ----------------- 🏠 Home Page -----------------
 if nav_option == "🏠 Home":
-    file_path = "data/processed/UHI_Weather_Building_Sentinel_LST_Featured_Cleaned.csv"
-    df = pd.read_csv(file_path)
     st.title("🏙️ Urban Heat Island (UHI) Index Predictor")
     st.markdown("**A Smart Approach to Understanding Urban Heat 🌎**")
-    st.markdown("""
-    - **🌡️ Predict UHI Index:** Enter parameters and get instant results.
-    - **📊 Explore Visualizations:** Compare trends, patterns & heatmaps.
-    - **📂 Upload Data:** Retrain models with custom datasets.
-    - **📖 Learn More:** Insights on how UHI affects cities.
-    """)
     st.image("assets/urban_heat.jpg", use_container_width=True)
-
-    file_path = "data/processed/UHI_Weather_Building_Sentinel_LST_Featured_Cleaned.csv"
-    df = pd.read_csv(file_path)
 
 # ----------------- 🔍 Predict UHI -----------------
 elif nav_option == "📈 Predict UHI":
     st.title("📌 Predict UHI Index")
 
-    # 🌍 Satellite Data
-    tab1, tab2, tab3 = st.tabs(["🌍 Satellite Data", "🌡️ Weather Factors", "🏢 Urban Features"])
-    
+    # ✅ Custom Slider Styling (Green Theme)
     st.markdown("""
     <style>
-        /* 🎨 Custom Slider Track */
         div[data-baseweb="slider"] > div > div {
-            background: linear-gradient(90deg, #FF6B6B, #FFD166) !important;
-            height: 4px !important;
+            background: linear-gradient(90deg, #2ECC71, #27AE60) !important;
+            height: 5px !important;
             border-radius: 10px;
         }
-
-        /* 🎨 Custom Slider Thumb */
         div[data-baseweb="slider"] > div > div > div {
-            background: #FFD166 !important;
+            background: #27AE60 !important;
             width: 25px !important;
             height: 25px !important;
             border-radius: 50% !important;
             border: 2px solid white !important;
         }
-
-        /* 🎨 Custom Hover Effect on Thumb */
         div[data-baseweb="slider"] > div > div > div:hover {
-            background: #FF8E8E !important;
-            transform: scale(1.8);
+            background: #2ECC71 !important;
+            transform: scale(1.5);
         }
     </style>
-""", unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
+
+    # 🧩 Tabs for Inputs
+    tab1, tab2, tab3 = st.tabs(["🌍 Satellite Data", "🌡️ Weather Factors", "🏢 Urban Features"])
 
     with tab1:
         st.subheader("🌍 Satellite Data")
@@ -140,23 +117,26 @@ elif nav_option == "📈 Predict UHI":
     with tab3:
         st.subheader("🏢 Urban Features")
         user_inputs.update({
-            'building_distance_m': st.slider("🏢 Building Distance (m)", 0, 500, 50),
             'building_density_50m': st.slider("🏠 Building Density (50m)", 0, 100, 5),
             'building_density_100m': st.slider("🏠 Building Density (100m)", 0, 100, 10),
             'building_density_200m': st.slider("🏠 Building Density (200m)", 0, 100, 20)
         })
 
-    # ✅ Save user inputs to session state
-    st.session_state["user_inputs"] = user_inputs
-
+    # ✅ Data Formatting & Feature Matching
     df_input = pd.DataFrame([user_inputs])
-    
-    # 🔥 Fix Feature Name Mismatch
-    for col in models["feature_names"]:
-        if col not in df_input.columns:
-            df_input[col] = 0  # Fill missing features with 0
+    df_input.columns = df_input.columns.str.replace(" ", "_").str.lower()
 
-    df_input = df_input[models["feature_names"]]  # Align with trained model
+    # 🔍 Fix Feature Name Case Sensitivity
+    model_features = [col for col in models["feature_names"]]
+    feature_mapping = {df_input_col.lower(): df_input_col for df_input_col in df_input.columns}
+    df_input = df_input.rename(columns={k: v for k, v in feature_mapping.items() if v in model_features})
+
+    # 🔥 Add Missing Features with Default Values
+    for col in model_features:
+        if col not in df_input.columns:
+            df_input[col] = 0
+
+    df_input = df_input[model_features]
 
     # 🔥 Predict Button
     if st.button("🔍 Predict UHI Index"):
@@ -168,8 +148,9 @@ elif nav_option == "📈 Predict UHI":
             st.metric(label="📌 **Predicted UHI Index (Random Forest)**", value=f"{uhi_rf:.6f}")
             st.metric(label="📌 **Predicted UHI Index (XGBoost)**", value=f"{uhi_xgb:.6f}")
 
-            # ✅ Save prediction in session state
-            st.session_state["uhi_value"] = uhi_rf  # Save RF model's UHI prediction for insights
+            # ✅ Store predictions in session state (Ensure these lines exist)
+            st.session_state["uhi_value"] = uhi_rf  # Save RF model's prediction
+            st.session_state["user_inputs"] = user_inputs  # Save user inputs
 
         except ValueError as e:
             st.error(f"⚠️ Prediction Error: {e}")
@@ -207,21 +188,22 @@ elif nav_option == "📊 Visualizations":
     ax.set_title("Distribution of UHI Index")
     st.pyplot(fig)
 
-    # 📊 **4️⃣ Box Plot: UHI Index by Time of Day**
-
-# 📖 Insights & Recommendations
+# ----------------- 📖 Insights & Recommendations -----------------
 elif nav_option == "📖 Insights":
     st.title("📖 Real-Time Insights & Recommendations")
 
-    # ✅ Check if predictions exist
-    if "user_inputs" not in st.session_state or "uhi_value" not in st.session_state:
+    # ✅ Check if session state has predictions stored
+    if "uhi_value" not in st.session_state:
         st.warning("⚠️ No prediction found! Please run the 'Predict UHI' tab first.")
         st.stop()
 
-    user_inputs = st.session_state["user_inputs"]
+    # ✅ Retrieve stored prediction
     uhi_value = st.session_state["uhi_value"]
 
-    # ✅ Drop non-numeric columns before calculating correlation
+    # ✅ Reload dataset for insights
+    file_path = "data/processed/UHI_Weather_Building_Sentinel_LST_Featured_Cleaned.csv"
+    df = pd.read_csv(file_path)
+
     non_numeric_cols = ["datetime", "hour_category", "wind_direction_category"]
     df_numeric = df.drop(columns=[col for col in non_numeric_cols if col in df.columns], errors="ignore")
 
@@ -269,15 +251,6 @@ elif nav_option == "📖 Insights":
 
     st.markdown("---")
     st.markdown("🚀 **Smarter Cities, Cooler Environments, Sustainable Growth**")
-
-    for key, tip in mitigation_tips.items():
-        st.markdown(f"✅ **{key}** - {tip}")
-
-    st.markdown("---")
-    st.markdown("🚀 **Smarter Cities, Cooler Environments, Sustainable Growth**")
-
-# ----------------- ℹ️ About Page -----------------
-
 # ----------------- ℹ️ About Page -----------------
 elif nav_option == "ℹ️ About":
     st.title("ℹ️ About This App")
@@ -302,38 +275,10 @@ elif nav_option == "ℹ️ About":
 
     st.markdown("---")
 
-    st.subheader("🚀 Features of the UHI Predictor")
-    st.markdown("""
-    - ✅ **Predict UHI Index** → Predicts UHI index for specific locations based on input parameters.  
-    - ✅ **Data Visualizations** → Interactive graphs, heatmaps, and statistical insights on UHI patterns.  
-    - ✅ **Upload Custom Data** → Users can upload CSV files to analyze custom datasets.  
-    - ✅ **Real-Time Insights** → Generates automatic recommendations based on predicted values.  
-    - ✅ **Dark Mode Support** → Ensures better readability and aesthetics.  
-    """)
-
-    st.markdown("---")
-
     st.subheader("📌 Machine Learning Models Used")
     st.markdown("""
     - 🔹 **Random Forest Regressor** → A tree-based ensemble model, effective for handling complex relationships.  
     - 🔹 **XGBoost Regressor** → A high-performance boosting algorithm optimized for predictive accuracy.  
-
-    Both models were trained and evaluated using **cross-validation** techniques for optimal accuracy.
-    """)
-
-    st.markdown("---")
-
-    st.subheader("📂 Data Used for Training")
-    st.markdown("""
-    The model was trained on a dataset collected on **24 July 2021**, covering the **Bronx and Manhattan region** in New York City. The dataset includes:  
-    - 🔹 **Latitude & Longitude** → Geospatial reference points  
-    - 🔹 **Urban Surface Temperature** → Satellite-derived temperature readings  
-    - 🔹 **Weather Factors** → Wind speed, humidity, air temperature, solar flux  
-    - 🔹 **Urban Infrastructure Data** → Building density, land surface types  
-    - 🔹 **Time-Based Features** → Hour, weekday, month, and categorized time slots  
-    - 🔹 **Satellite Data** → NDVI (Vegetation Index), NDBI (Built-Up Index), Surface Albedo  
-
-    Feature engineering techniques, including **categorization, one-hot encoding, and interaction features**, were applied to improve model accuracy.
     """)
 
     st.markdown("---")
@@ -352,10 +297,7 @@ elif nav_option == "ℹ️ About":
     st.markdown("""
     💡 **Vidit Gupta**  
     A passionate **Cybersecurity Engineer & Cloud Security Consultant** with expertise in **Cyber Risk, Cloud Security, DevSecOps, and Compliance Audits**.  
-    With a strong background in **Cybersecurity Assessments, IT Risk Management, and Secure Cloud Architecture**, Vidit specializes in building **secure, scalable, and resilient solutions** to protect businesses from evolving cyber threats.  
-    
-    
-    🚀 Dedicated to **ensuring security-first digital transformations** and **strengthening enterprise cyber resilience**.
+    🚀 Dedicated to **ensuring security-first digital transformations**.
     """)
 
     st.markdown("---")

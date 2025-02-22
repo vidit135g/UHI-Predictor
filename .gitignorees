@@ -1,0 +1,12 @@
+# .gitignore
+# ------------------------------
+# Ignore virtual environment folders
+venv/
+.env/
+
+# Ignore Python cache
+__pycache__/
+*.pyc
+
+models/*.log
+models/*.tmp
