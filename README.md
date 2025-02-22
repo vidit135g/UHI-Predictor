@@ -5,9 +5,12 @@
 
 ---
 
-## 🎥 App Demo  
-[![Watch the Video](https://youtu.be/3TxoFSmJCkY)  
-📌 *Click the image above to watch the app in action!*  
+## 🎥 Live Demo  
+### 📌 Watch the Full Demo Here:  
+[![Watch the Video](assets/urban_heat.jpg)](https://youtu.be/3TxoFSmJCkY)  
+
+### 📺 Embedded Video Demo:  
+<iframe width="800" height="450" src="https://www.youtube.com/embed/YOUR_VIDEO_ID" frameborder="0" allowfullscreen></iframe>  
 
 ---
 
