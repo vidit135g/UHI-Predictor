@@ -7,10 +7,7 @@
 
 ## 🎥 Live Demo  
 ### 📌 Watch the Full Demo Here:  
-[![Watch the Video](assets/urban_heat.jpg)](https://youtu.be/3TxoFSmJCkY)  
-
-### 📺 Embedded Video Demo:  
-<iframe width="800" height="450" src="https://www.youtube.com/embed/YOUR_VIDEO_ID" frameborder="0" allowfullscreen></iframe>  
+<iframe width="800" height="450" src="https://youtu.be/2-cxQMd-Jrc" frameborder="0" allowfullscreen></iframe>  
 
 ---
 
