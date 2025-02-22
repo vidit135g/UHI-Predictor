@@ -1,3 +1,13 @@
+<html>
+<head>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+    body {
+      font-family: 'Poppins', sans-serif;
+    }
+  </style>
+</head>
+<body>
 # 🌆 UHI Index Predictor  
 ![Urban Heat](assets/urban_heat.jpg)  
 
@@ -77,3 +87,5 @@ Both models are trained and **compared using MAE, RMSE, and R² scores** for opt
 ```bash
 git clone https://github.com/your-username/UHI-Predictor.git
 cd UHI-Predictor
+</body>
+</html>
