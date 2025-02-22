@@ -177,10 +177,10 @@ elif nav_option == "📊 Visualizations":
     y_feature = st.selectbox("📌 Select Y-Axis Feature", df_numeric.columns, index=list(df_numeric.columns).index("uhi_index"))
 
     fig = px.scatter(
-        df_numeric, x=x_feature, y=y_feature, trendline="ols",
-        labels={x_feature: x_feature, y_feature: y_feature},
-        title=f"📌 Relationship Between {x_feature} and {y_feature}"
-    )
+    df_numeric, x=x_feature, y=y_feature,
+    labels={x_feature: x_feature, y_feature: y_feature},
+    title=f"📌 Relationship Between {x_feature} and {y_feature}"
+)
 
     st.plotly_chart(fig, use_container_width=True)
 

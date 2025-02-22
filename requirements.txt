@@ -27,3 +27,5 @@ optuna              # Hyperparameter tuning & model optimization
 # ⚙️ Workflow & Development
 prefect             # Workflow automation & task orchestration
 jupyterlab          # Jupyter Notebook environment for interactive computing
+
+statsmodels
